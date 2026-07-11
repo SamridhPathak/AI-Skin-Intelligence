@@ -58,10 +58,11 @@ def login_user(form_data: OAuth2PasswordRequestForm, db: Session):
 
     token = create_access_token(
     {
+        "id": existing_user.id,
         "sub": existing_user.email,
         "role": existing_user.role
     }
-)
+    )
 
     return {
         "access_token": token,

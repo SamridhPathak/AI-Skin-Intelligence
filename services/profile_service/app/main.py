@@ -1,0 +1,26 @@
+from fastapi import FastAPI
+
+from services.profile_service.app.db.init_db import init_db
+
+from services.profile_service.app.api.profile import router as profile_router
+
+app = FastAPI(
+    title="Profile Service",
+    version="1.0.0"
+)
+
+app.include_router(profile_router)
+
+@app.on_event("startup")
+def startup():
+
+    init_db()
+
+    print("✅ Profile Database Initialized")
+
+
+@app.get("/health")
+def health():
+    return {
+        "status": "Profile Service Running"
+    }
