@@ -44,9 +44,13 @@ def create_profile(profile: ProfileCreate, current_user, db: Session):
 
 def get_profile(current_user, db: Session):
 
+    print("CURRENT USER:", current_user)
+
     profile = db.query(Profile).filter(
         Profile.user_id == current_user["id"]
     ).first()
+
+    print("PROFILE:", profile)
 
     if not profile:
         raise HTTPException(
