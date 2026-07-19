@@ -3,11 +3,16 @@ from fastapi import Depends, HTTPException
 from services.auth_service.app.utils.dependencies import get_current_user
 
 
-def require_role(role: str):
+def require_role(*roles: str):
+    """
+    Usage:
+        Depends(require_role("admin"))
+        Depends(require_role("admin", "dermatologist"))
+    """
 
     def role_checker(current_user=Depends(get_current_user)):
 
-        if current_user["role"] != role:
+        if current_user["role"] not in roles:
             raise HTTPException(
                 status_code=403,
                 detail="Access Denied"

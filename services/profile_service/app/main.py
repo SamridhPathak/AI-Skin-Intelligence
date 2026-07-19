@@ -8,13 +8,6 @@ app = FastAPI(
     version="1.0.0"
 )
 
-app.include_router(profile_router)
-
-app = FastAPI(
-    title="Profile Service",
-    version="1.0.0"
-)
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173"],
@@ -25,12 +18,11 @@ app.add_middleware(
 
 app.include_router(profile_router)
 
+
 @app.on_event("startup")
 def startup():
-
     init_db()
-
-    print("✅ Profile Database Initialized")
+    print("Profile Database Initialized")
 
 
 @app.get("/health")

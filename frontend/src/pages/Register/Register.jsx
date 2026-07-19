@@ -2,14 +2,22 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { registerUser } from "../../services/auth";
 
-function Register() {
+const ROLE_OPTIONS = [
+  { value: "user", label: "User (skincare consumer)" },
+  { value: "consultant", label: "Skincare consultant" },
+  { value: "dermatologist", label: "Dermatologist" },
+  { value: "admin", label: "Admin" },
+];
 
+function Register() {
   const navigate = useNavigate();
+  const [error, setError] = useState("");
 
   const [formData, setFormData] = useState({
     full_name: "",
     email: "",
     password: "",
+    role: "user",
   });
 
   const handleChange = (e) => {
@@ -21,37 +29,34 @@ function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
     try {
       await registerUser(formData);
-
-      alert("Registration Successful!");
-
       navigate("/login");
-
     } catch (err) {
-      alert(err.response?.data?.detail || "Registration Failed");
+      setError(err.response?.data?.detail || "Registration failed. Please try again.");
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex justify-center items-center">
+    <div className="min-h-screen flex justify-center items-center px-4">
+      <div className="glass w-full max-w-[420px] p-10">
+        <h1 className="text-3xl font-semibold mb-8 text-center">Create account</h1>
 
-      <div className="bg-slate-900 p-10 rounded-2xl w-[420px]">
+        {error && (
+          <p className="pill pill-flagged mb-4 w-full text-center py-2">{error}</p>
+        )}
 
-        <h1 className="text-3xl font-bold text-white mb-8 text-center">
-          Create Account
-        </h1>
-
-        <form onSubmit={handleSubmit} className="space-y-5">
-
+        <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="text"
             name="full_name"
             value={formData.full_name}
             onChange={handleChange}
-            placeholder="Full Name"
-            className="w-full p-3 rounded-lg bg-slate-800 text-white outline-none"
+            placeholder="Full name"
+            className="field"
+            required
           />
 
           <input
@@ -60,7 +65,8 @@ function Register() {
             value={formData.email}
             onChange={handleChange}
             placeholder="Email"
-            className="w-full p-3 rounded-lg bg-slate-800 text-white outline-none"
+            className="field"
+            required
           />
 
           <input
@@ -69,27 +75,36 @@ function Register() {
             value={formData.password}
             onChange={handleChange}
             placeholder="Password"
-            className="w-full p-3 rounded-lg bg-slate-800 text-white outline-none"
+            className="field"
+            required
           />
+
+          <select
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+            className="field"
+          >
+            {ROLE_OPTIONS.map((r) => (
+              <option key={r.value} value={r.value}>{r.label}</option>
+            ))}
+          </select>
 
           <button
             type="submit"
-            className="w-full bg-cyan-500 hover:bg-cyan-600 text-white py-3 rounded-lg font-semibold"
+            className="w-full bg-ocean-500 hover:bg-ocean-600 text-white py-3 rounded-xl font-medium transition"
           >
             Register
           </button>
-
         </form>
 
-        <p className="text-gray-400 mt-6 text-center">
+        <p className="text-ink-secondary mt-6 text-center text-sm">
           Already have an account?{" "}
-          <Link to="/login" className="text-cyan-400">
+          <Link to="/login" className="text-ocean-600 font-medium">
             Login
           </Link>
         </p>
-
       </div>
-
     </div>
   );
 }

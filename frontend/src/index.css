@@ -1,1 +1,202 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap');
 @import "tailwindcss";
+
+/* Tailwind v4 reads design tokens from this @theme block instead of
+   tailwind.config.js — every value here becomes a utility class,
+   e.g. --color-ocean-500 => bg-ocean-500 / text-ocean-500 / border-ocean-500 */
+@theme {
+  --color-canvas-start: #EEF4FB;
+  --color-canvas-mid: #F7FAFC;
+  --color-canvas-end: #EAF2F8;
+
+  --color-ocean-50: #EAF2FA;
+  --color-ocean-100: #DBE9F7;
+  --color-ocean-300: #8FB9DE;
+  --color-ocean-500: #2F6FA8;
+  --color-ocean-600: #245883;
+  --color-ocean-700: #1C3D5C;
+
+  --color-sage-50: #E9F3EE;
+  --color-sage-100: #D5E9DE;
+  --color-sage-500: #2D8065;
+  --color-sage-600: #236650;
+
+  --color-clay-50: #FBEDE7;
+  --color-clay-100: #F7E3DB;
+  --color-clay-500: #C15C3B;
+  --color-clay-600: #9C4A2F;
+
+  --color-danger-50: #FBEAEA;
+  --color-danger-500: #B4453F;
+
+  --color-ink-primary: #1C3D5C;
+  --color-ink-secondary: #5A6B7A;
+  --color-ink-muted: #8FA0AC;
+
+  --font-display: "Space Grotesk", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --radius-card: 14px;
+  --radius-pill: 999px;
+
+  --shadow-glass: 0 4px 20px rgba(31, 58, 94, 0.06);
+  --shadow-glass-hover: 0 6px 28px rgba(31, 58, 94, 0.10);
+}
+
+@layer base {
+  body {
+    font-family: var(--font-body);
+    color: var(--color-ink-primary);
+    background:
+      radial-gradient(circle at 15% 20%, rgb(47 111 168 / 0.16), transparent 40%),
+      radial-gradient(circle at 85% 15%, rgb(45 128 101 / 0.14), transparent 38%),
+      radial-gradient(circle at 25% 85%, rgb(193 92 59 / 0.10), transparent 42%),
+      radial-gradient(circle at 90% 80%, rgb(47 111 168 / 0.12), transparent 40%),
+      linear-gradient(135deg, var(--color-canvas-start) 0%, var(--color-canvas-mid) 50%, var(--color-canvas-end) 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    color: var(--color-ink-primary);
+  }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@layer utilities {
+  .animate-in {
+    animation: fade-in-up 0.5s ease both;
+  }
+  .delay-1 { animation-delay: 0.08s; }
+  .delay-2 { animation-delay: 0.16s; }
+  .delay-3 { animation-delay: 0.24s; }
+  .delay-4 { animation-delay: 0.32s; }
+  .delay-5 { animation-delay: 0.4s; }
+
+  .lift {
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  }
+  .lift:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-glass-hover);
+  }
+}
+
+@layer components {
+  .glass {
+    background: rgb(255 255 255 / 0.6);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgb(255 255 255 / 0.6);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-glass);
+  }
+  .glass-hover {
+    transition: all 0.2s ease;
+  }
+  .glass-hover:hover {
+    box-shadow: var(--shadow-glass-hover);
+    background: rgb(255 255 255 / 0.7);
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--color-ink-secondary);
+    transition: background-color 0.15s, color 0.15s;
+  }
+  .nav-item-active {
+    background: rgb(47 111 168 / 0.1);
+    color: var(--color-ocean-600);
+    font-weight: 500;
+  }
+  .nav-item:hover:not(.nav-item-active) {
+    background: rgb(255 255 255 / 0.4);
+    color: var(--color-ink-primary);
+  }
+
+  .pill {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.625rem;
+    border-radius: var(--radius-pill);
+    font-weight: 500;
+  }
+  .pill-active  { background: var(--color-sage-100); color: var(--color-sage-600); }
+  .pill-pending { background: var(--color-clay-100); color: var(--color-clay-600); }
+  .pill-flagged { background: var(--color-danger-50); color: var(--color-danger-500); }
+
+  .metric-card {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .metric-label { font-size: 0.75rem; color: var(--color-ink-secondary); }
+  .metric-value { font-family: var(--font-display); font-size: 1.5rem; color: var(--color-ink-primary); }
+
+  .avatar {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 500;
+    font-family: var(--font-mono);
+  }
+
+  /* Shared form control look — every input/select across the app uses this
+     so "everything is a dropdown, nothing looks inconsistent" holds true */
+  .field {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    background: rgb(255 255 255 / 0.6);
+    border: 1px solid rgb(255 255 255 / 0.6);
+    color: var(--color-ink-primary);
+    font-size: 0.9rem;
+  }
+  .field:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--color-ocean-300);
+  }
+  .field::placeholder { color: var(--color-ink-muted); }
+
+  .btn-primary {
+    background: var(--color-ocean-500);
+    color: white;
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: 0 4px 14px rgb(47 111 168 / 0.25);
+  }
+  .btn-primary:hover {
+    background: var(--color-ocean-600);
+    box-shadow: 0 6px 20px rgb(47 111 168 / 0.32);
+  }
+  .btn-primary:active {
+    transform: scale(0.97);
+  }
+
+  .btn-outline {
+    background: rgb(255 255 255 / 0.5);
+    border: 1px solid rgb(255 255 255 / 0.7);
+    color: var(--color-ocean-700);
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    transition: transform 0.15s ease, background-color 0.15s ease;
+  }
+  .btn-outline:hover { background: rgb(255 255 255 / 0.7); }
+  .btn-outline:active { transform: scale(0.97); }
+}

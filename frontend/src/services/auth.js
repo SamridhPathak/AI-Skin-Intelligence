@@ -1,11 +1,11 @@
-import api from "./api";
+import { authApi } from "./api";
 
 export const registerUser = (data) => {
-  return api.post("/auth/register", data);
+  return authApi.post("/auth/register", data);
 };
 
 export const loginUser = (data) => {
-  return api.post(
+  return authApi.post(
     "/auth/login",
     new URLSearchParams(data),
     {

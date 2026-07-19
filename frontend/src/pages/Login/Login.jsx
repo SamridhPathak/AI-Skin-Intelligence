@@ -2,9 +2,19 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { loginUser } from "../../services/auth";
 import { getMyProfile } from "../../services/profile";
+import { useAuth } from "../../context/AuthContext";
+
+// Where each role lands right after login. Add consultant/dermatologist
+// here once those dashboards exist — until then they fall through to
+// the default "user" branch below.
+const ROLE_HOME = {
+  admin: "/admin",
+};
 
 function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
+  const [error, setError] = useState("");
 
   const [formData, setFormData] = useState({
     username: "",
@@ -20,56 +30,52 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
     try {
-      // Login
       const res = await loginUser(formData);
+      const decoded = login(res.data.access_token);
 
-      // Save JWT
-      localStorage.setItem("token", res.data.access_token);
-
-      alert("Login Successful");
-
-      // Check whether profile exists
-      try {
-        await getMyProfile();
-
-        // Existing user
-        navigate("/profile");
-
-      } catch (err) {
-
-        if (err.response?.status === 404) {
-          // New user
-          navigate("/create-profile");
-        } else {
-          alert("Unable to verify profile");
-        }
-
+      const roleHome = ROLE_HOME[decoded?.role];
+      if (roleHome) {
+        navigate(roleHome);
+        return;
       }
 
+      // Default "user" flow: does a profile already exist?
+      try {
+        await getMyProfile();
+        navigate("/profile");
+      } catch (err) {
+        if (err.response?.status === 404) {
+          navigate("/create-profile");
+        } else {
+          setError("Unable to verify profile. Please try again.");
+        }
+      }
     } catch (err) {
-      alert(err.response?.data?.detail || "Login Failed");
+      setError(err.response?.data?.detail || "Login failed. Check your email and password.");
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex justify-center items-center">
-      <div className="bg-slate-900 p-10 rounded-2xl w-[420px]">
+    <div className="min-h-screen flex justify-center items-center px-4">
+      <div className="glass w-full max-w-[420px] p-10">
+        <h1 className="text-3xl font-semibold mb-8 text-center">Login</h1>
 
-        <h1 className="text-3xl font-bold text-white mb-8 text-center">
-          Login
-        </h1>
+        {error && (
+          <p className="pill pill-flagged mb-4 w-full text-center py-2">{error}</p>
+        )}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-
+        <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="email"
             name="username"
             placeholder="Email"
             value={formData.username}
             onChange={handleChange}
-            className="w-full p-3 rounded-lg bg-slate-800 text-white outline-none"
+            className="field"
+            required
           />
 
           <input
@@ -78,25 +84,24 @@ function Login() {
             placeholder="Password"
             value={formData.password}
             onChange={handleChange}
-            className="w-full p-3 rounded-lg bg-slate-800 text-white outline-none"
+            className="field"
+            required
           />
 
           <button
             type="submit"
-            className="w-full bg-cyan-500 hover:bg-cyan-600 text-white py-3 rounded-lg font-semibold"
+            className="w-full bg-ocean-500 hover:bg-ocean-600 text-white py-3 rounded-xl font-medium transition"
           >
             Login
           </button>
-
         </form>
 
-        <p className="text-gray-400 mt-6 text-center">
+        <p className="text-ink-secondary mt-6 text-center text-sm">
           Don't have an account?{" "}
-          <Link to="/register" className="text-cyan-400">
+          <Link to="/register" className="text-ocean-600 font-medium">
             Register
           </Link>
         </p>
-
       </div>
     </div>
   );

@@ -2,36 +2,47 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createProfile } from "../../services/profile";
 
-
-
 const SKIN_CONCERNS = [
-  "Acne",
-  "Blackheads",
-  "Whiteheads",
-  "Pigmentation",
-  "Dark Spots",
-  "Dark Circles",
-  "Wrinkles",
-  "Fine Lines",
-  "Large Pores",
-  "Dryness",
-  "Oiliness",
-  "Redness",
-  "Sensitive Skin",
-  "Dullness",
+  "Acne", "Blackheads", "Whiteheads", "Pigmentation", "Dark Spots",
+  "Dark Circles", "Wrinkles", "Fine Lines", "Large Pores", "Dryness",
+  "Oiliness", "Redness", "Sensitive Skin", "Dullness",
 ];
+
+const ALLERGY_OPTIONS = [
+  "None", "Fragrance", "Parabens", "Sulfates", "Essential Oils",
+  "Nuts", "Latex", "Salicylates",
+];
+
+const GOAL_OPTIONS = [
+  "Glowing Skin", "Reduce Acne", "Anti-Aging", "Even Skin Tone",
+  "Hydration", "Oil Control", "Sensitive Skin Care", "Reduce Pores",
+];
+
+function Chip({ label, active, onClick }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`text-sm px-4 py-2 rounded-pill transition-all ${
+        active
+          ? "bg-ocean-500 text-white shadow-[0_4px_14px_rgb(47_111_168_/_0.3)]"
+          : "bg-white/50 text-ink-secondary border border-white/60 hover:bg-white/70"
+      }`}
+    >
+      {label}
+    </button>
+  );
+}
 
 function CreateProfile() {
   const navigate = useNavigate();
+  const [error, setError] = useState("");
 
   const [formData, setFormData] = useState({
     age: "",
     gender: "",
     skin_type: "",
     skin_tone: "",
-    skin_concerns: [],
-    allergies: "",
-    goals: "",
     water_intake: "",
     sleep_hours: "",
     exercise_frequency: "",
@@ -39,102 +50,76 @@ function CreateProfile() {
     sun_exposure: "",
   });
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+  const [skinConcerns, setSkinConcerns] = useState([]);
+  const [allergies, setAllergies] = useState([]);
+  const [goals, setGoals] = useState([]);
+
+  const toggle = (list, setList, value) => {
+    setList(
+      list.includes(value) ? list.filter((v) => v !== value) : [...list, value]
+    );
   };
 
-  const toggleConcern = (concern) => {
-    setFormData((prev) => ({
-        ...prev,
-        skin_concerns: prev.skin_concerns.includes(concern)
-        ? prev.skin_concerns.filter((item) => item !== concern)
-        : [...prev.skin_concerns, concern],
-    }));
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+
+    const payload = {
+      ...formData,
+      age: Number(formData.age),
+      water_intake: Number(formData.water_intake),
+      sleep_hours: Number(formData.sleep_hours),
+      skin_concerns: skinConcerns.join(", "),
+      allergies: allergies.length ? allergies.join(", ") : "None",
+      goals: goals.join(", "),
+    };
 
     try {
-      const payload = {
-        ...formData,
-        skin_concerns: formData.skin_concerns.join(", "),
-      };
       await createProfile(payload);
-
-      alert("Profile Created Successfully");
-
       navigate("/profile");
     } catch (err) {
-      console.log(err.response?.data);
-      alert(JSON.stringify(err.response?.data));
+      setError(err.response?.data?.detail || "Couldn't save your profile. Please try again.");
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex justify-center items-center py-10">
-      <div className="bg-slate-900 w-[700px] rounded-xl p-10">
+    <div className="min-h-screen flex justify-center items-center px-4 py-12">
+      <form onSubmit={handleSubmit} className="glass w-full max-w-[720px] p-10 space-y-6">
+        <h1 className="text-3xl font-semibold text-center">Create skin profile</h1>
 
-        <h1 className="text-4xl font-bold text-white mb-8 text-center">
-          Create Skin Profile
-        </h1>
+        {error && <p className="pill pill-flagged py-2 px-4 w-fit mx-auto">{error}</p>}
 
-        <form
-          onSubmit={handleSubmit}
-          className="grid grid-cols-2 gap-5"
-        >
-
-          {/* Age */}
+        <div className="grid sm:grid-cols-2 gap-4">
           <input
             type="number"
             name="age"
-            min="10"
-            max="100"
             placeholder="Age"
             value={formData.age}
             onChange={handleChange}
-            className="p-3 rounded bg-slate-800 text-white"
+            className="field"
+            required
           />
-
-          {/* Gender */}
-          <select
-            name="gender"
-            value={formData.gender}
-            onChange={handleChange}
-            className="p-3 rounded bg-slate-800 text-white"
-          >
-            <option value="">Select Gender</option>
+          <select name="gender" value={formData.gender} onChange={handleChange} className="field" required>
+            <option value="" disabled>Select gender</option>
             <option value="Male">Male</option>
             <option value="Female">Female</option>
             <option value="Other">Other</option>
           </select>
 
-          {/* Skin Type */}
-          <select
-            name="skin_type"
-            value={formData.skin_type}
-            onChange={handleChange}
-            className="p-3 rounded bg-slate-800 text-white"
-          >
-            <option value="">Skin Type</option>
+          <select name="skin_type" value={formData.skin_type} onChange={handleChange} className="field" required>
+            <option value="" disabled>Skin type</option>
             <option value="Normal">Normal</option>
             <option value="Dry">Dry</option>
             <option value="Oily">Oily</option>
             <option value="Combination">Combination</option>
             <option value="Sensitive">Sensitive</option>
           </select>
-
-          {/* Skin Tone */}
-          <select
-            name="skin_tone"
-            value={formData.skin_tone}
-            onChange={handleChange}
-            className="p-3 rounded bg-slate-800 text-white"
-          >
-            <option value="">Skin Tone</option>
+          <select name="skin_tone" value={formData.skin_tone} onChange={handleChange} className="field" required>
+            <option value="" disabled>Skin tone</option>
             <option value="Very Fair">Very Fair</option>
             <option value="Fair">Fair</option>
             <option value="Light">Light</option>
@@ -142,131 +127,83 @@ function CreateProfile() {
             <option value="Tan">Tan</option>
             <option value="Deep">Deep</option>
           </select>
+        </div>
 
-          {/* Skin Concern */}
-          <div className="col-span-2">
+        <div>
+          <p className="text-sm font-medium text-ink-primary mb-2">Skin concerns</p>
+          <div className="flex flex-wrap gap-2">
+            {SKIN_CONCERNS.map((c) => (
+              <Chip key={c} label={c} active={skinConcerns.includes(c)} onClick={() => toggle(skinConcerns, setSkinConcerns, c)} />
+            ))}
+          </div>
+        </div>
 
-            <label className="block text-white mb-3 font-semibold">
-                Skin Concerns
-            </label>
+        <div>
+          <p className="text-sm font-medium text-ink-primary mb-2">Allergies</p>
+          <div className="flex flex-wrap gap-2">
+            {ALLERGY_OPTIONS.map((a) => (
+              <Chip key={a} label={a} active={allergies.includes(a)} onClick={() => toggle(allergies, setAllergies, a)} />
+            ))}
+          </div>
+        </div>
 
-            <div className="flex flex-wrap gap-2">
+        <div>
+          <p className="text-sm font-medium text-ink-primary mb-2">Goals</p>
+          <div className="flex flex-wrap gap-2">
+            {GOAL_OPTIONS.map((g) => (
+              <Chip key={g} label={g} active={goals.includes(g)} onClick={() => toggle(goals, setGoals, g)} />
+            ))}
+          </div>
+        </div>
 
-                {SKIN_CONCERNS.map((concern) => (
-
-                <button
-                    key={concern}
-                    type="button"
-                    onClick={() => toggleConcern(concern)}
-                    className={`px-4 py-2 rounded-full border transition ${
-                    formData.skin_concerns.includes(concern)
-                        ? "bg-cyan-500 border-cyan-500 text-white"
-                        : "bg-slate-800 border-slate-700 text-gray-300"
-                    }`}
-                >
-                    {concern}
-                </button>
-
-                ))}
-
-            </div>
-
-           </div>
-
-          {/* Allergies */}
-          <input
-            name="allergies"
-            placeholder="Allergies"
-            value={formData.allergies}
-            onChange={handleChange}
-            className="p-3 rounded bg-slate-800 text-white"
-          />
-
-          {/* Goals */}
-          <input
-            name="goals"
-            placeholder="Goals"
-            value={formData.goals}
-            onChange={handleChange}
-            className="p-3 rounded bg-slate-800 text-white"
-          />
-
-          {/* Water Intake */}
+        <div className="grid sm:grid-cols-2 gap-4">
           <input
             type="number"
-            step="0.5"
-            min="0"
-            max="10"
+            step="0.1"
             name="water_intake"
-            placeholder="Water Intake (Litres)"
+            placeholder="Water intake (litres)"
             value={formData.water_intake}
             onChange={handleChange}
-            className="p-3 rounded bg-slate-800 text-white"
+            className="field"
+            required
           />
-
-          {/* Sleep Hours */}
           <input
             type="number"
             step="0.5"
-            min="0"
-            max="24"
             name="sleep_hours"
-            placeholder="Sleep Hours"
+            placeholder="Sleep hours"
             value={formData.sleep_hours}
             onChange={handleChange}
-            className="p-3 rounded bg-slate-800 text-white"
+            className="field"
+            required
           />
 
-          {/* Exercise */}
-          <select
-            name="exercise_frequency"
-            value={formData.exercise_frequency}
-            onChange={handleChange}
-            className="p-3 rounded bg-slate-800 text-white"
-          >
-            <option value="">Exercise</option>
+          <select name="exercise_frequency" value={formData.exercise_frequency} onChange={handleChange} className="field" required>
+            <option value="" disabled>Exercise</option>
             <option value="Never">Never</option>
             <option value="Occasionally">Occasionally</option>
             <option value="Weekly">Weekly</option>
             <option value="Daily">Daily</option>
           </select>
-
-          {/* Stress Level */}
-          <select
-            name="stress_level"
-            value={formData.stress_level}
-            onChange={handleChange}
-            className="p-3 rounded bg-slate-800 text-white"
-          >
-            <option value="">Stress Level</option>
+          <select name="stress_level" value={formData.stress_level} onChange={handleChange} className="field" required>
+            <option value="" disabled>Stress level</option>
             <option value="Low">Low</option>
             <option value="Medium">Medium</option>
             <option value="High">High</option>
           </select>
 
-          {/* Sun Exposure */}
-          <select
-            name="sun_exposure"
-            value={formData.sun_exposure}
-            onChange={handleChange}
-            className="p-3 rounded bg-slate-800 text-white"
-          >
-            <option value="">Sun Exposure</option>
+          <select name="sun_exposure" value={formData.sun_exposure} onChange={handleChange} className="field" required>
+            <option value="" disabled>Sun exposure</option>
             <option value="Low">Low</option>
             <option value="Medium">Medium</option>
             <option value="High">High</option>
           </select>
+        </div>
 
-          <button
-            type="submit"
-            className="col-span-2 bg-cyan-500 hover:bg-cyan-600 py-3 rounded-lg text-white font-semibold transition"
-          >
-            Save Profile
-          </button>
-
-        </form>
-
-      </div>
+        <button type="submit" className="btn-primary w-full">
+          Save profile
+        </button>
+      </form>
     </div>
   );
 }

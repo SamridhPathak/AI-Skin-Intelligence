@@ -5,7 +5,7 @@ from services.auth_service.app.schemas.user import UserCreate
 from services.auth_service.app.utils.security import hash_password
 from fastapi import HTTPException
 
-from fastapi.security import OAuth2PasswordRequestForm  
+from fastapi.security import OAuth2PasswordRequestForm
 from services.auth_service.app.utils.security import verify_password
 
 from services.auth_service.app.utils.jwt import create_access_token
@@ -13,7 +13,6 @@ from services.auth_service.app.utils.jwt import create_access_token
 
 def register_user(user: UserCreate, db: Session):
 
-    # Check if email already exists
     existing_user = db.query(User).filter(User.email == user.email).first()
 
     if existing_user:
@@ -22,11 +21,11 @@ def register_user(user: UserCreate, db: Session):
             detail="Email already registered"
         )
 
-    # Create new user
     new_user = User(
         full_name=user.full_name,
         email=user.email,
-        password_hash=hash_password(user.password)
+        password_hash=hash_password(user.password),
+        role=user.role,
     )
 
     db.add(new_user)
@@ -34,7 +33,8 @@ def register_user(user: UserCreate, db: Session):
     db.refresh(new_user)
 
     return {
-        "message": "User registered successfully"
+        "message": "User registered successfully",
+        "role": new_user.role,
     }
 
 
@@ -57,14 +57,17 @@ def login_user(form_data: OAuth2PasswordRequestForm, db: Session):
         )
 
     token = create_access_token(
-    {
-        "id": existing_user.id,
-        "sub": existing_user.email,
-        "role": existing_user.role
-    }
+        {
+            "id": existing_user.id,
+            "sub": existing_user.email,
+            "role": existing_user.role,
+        }
     )
 
+    # Returning role alongside the token saves the frontend an extra
+    # decode step / /auth/me round trip just to know where to redirect.
     return {
         "access_token": token,
-        "token_type": "bearer"
+        "token_type": "bearer",
+        "role": existing_user.role,
     }

@@ -9,12 +9,6 @@ app = FastAPI(
     title="Authentication Service",
     version="1.0.0"
 )
-app.include_router(auth_router)
-
-app = FastAPI(
-    title="Authentication Service",
-    version="1.0.0"
-)
 
 app.add_middleware(
     CORSMiddleware,
@@ -26,20 +20,23 @@ app.add_middleware(
 
 app.include_router(auth_router)
 
+
 @app.on_event("startup")
 def startup():
     with engine.connect() as connection:
         connection.execute(text("SELECT 1"))
-        print("✅ Database Connected Successfully!")
+        print("Database Connected Successfully!")
 
     init_db()
-    print("✅ Database Initialized!")
+    print("Database Initialized!")
+
 
 @app.get("/")
 def root():
     return {
         "message": "Authentication Service"
     }
+
 
 @app.get("/health")
 def health():
