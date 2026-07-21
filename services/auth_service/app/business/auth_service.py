@@ -64,10 +64,16 @@ def login_user(form_data: OAuth2PasswordRequestForm, db: Session):
         }
     )
 
-    # Returning role alongside the token saves the frontend an extra
-    # decode step / /auth/me round trip just to know where to redirect.
     return {
         "access_token": token,
         "token_type": "bearer",
         "role": existing_user.role,
     }
+
+
+def get_all_users(db: Session):
+    return db.query(User).order_by(User.created_at.desc()).all()
+
+
+def get_users_by_role(role: str, db: Session):
+    return db.query(User).filter(User.role == role).order_by(User.full_name).all()

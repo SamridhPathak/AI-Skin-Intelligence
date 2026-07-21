@@ -1,15 +1,18 @@
+from typing import List
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from services.auth_service.app.schemas.user import UserCreate
+from services.auth_service.app.schemas.user import UserCreate, UserOut
 from services.auth_service.app.db.dependencies import get_db
-from services.auth_service.app.business.auth_service import register_user
+from services.auth_service.app.business.auth_service import (
+    register_user,
+    login_user,
+    get_all_users,
+)
 
 from fastapi.security import OAuth2PasswordRequestForm
-from services.auth_service.app.business.auth_service import login_user
 
 from services.auth_service.app.utils.dependencies import get_current_user
-
 from services.auth_service.app.utils.roles import require_role
 
 
@@ -33,7 +36,14 @@ def me(current_user=Depends(get_current_user)):
 
 @router.get("/admin")
 def admin_dashboard(current_user=Depends(require_role("admin"))):
-
     return {
         "message": "Welcome Admin"
     }
+
+@router.get("/users", response_model=List[UserOut])
+def list_users(
+    db: Session = Depends(get_db),
+    current_user=Depends(require_role("admin")),
+):
+    """Admin-only: full user list for the Admin dashboard."""
+    return get_all_users(db)

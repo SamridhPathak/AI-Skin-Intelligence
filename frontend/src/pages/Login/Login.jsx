@@ -9,6 +9,8 @@ import { useAuth } from "../../context/AuthContext";
 // the default "user" branch below.
 const ROLE_HOME = {
   admin: "/admin",
+  consultant: "/consultant",
+  dermatologist: "/dermatologist",
 };
 
 function Login() {
