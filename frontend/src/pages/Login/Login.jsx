@@ -98,6 +98,10 @@ function Login() {
           </button>
         </form>
 
+        <p className="text-center text-sm mt-3">
+          <Link to="/forgot-password" className="text-ocean-600 font-medium">Forgot password?</Link>
+        </p>
+
         <p className="text-ink-secondary mt-6 text-center text-sm">
           Don't have an account?{" "}
           <Link to="/register" className="text-ocean-600 font-medium">

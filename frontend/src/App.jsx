@@ -1,13 +1,18 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
+import { ToastProvider } from "./context/ToastContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 import Landing from "./pages/Landing/Landing";
 import Register from "./pages/Register/Register";
 import Login from "./pages/Login/Login";
 import Profile from "./pages/Profile/Profile";
+import EditProfile from "./pages/EditProfile/EditProfile";
 import CreateProfile from "./pages/CreateProfile/CreateProfile";
+import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword/ResetPassword";
 import Unauthorized from "./pages/Unauthorized";
+import NotFound from "./pages/NotFound/NotFound";
 
 import AdminDashboard from "./pages/Dashboard/AdminDashboard";
 import AdminUsers from "./pages/Dashboard/admin/AdminUsers";
@@ -29,36 +34,44 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Routes>
-          {/* Public */}
-          <Route path="/" element={<Landing />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/unauthorized" element={<Unauthorized />} />
+        <ToastProvider>
+          <Routes>
+            {/* Public */}
+            <Route path="/" element={<Landing />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/unauthorized" element={<Unauthorized />} />
 
-          {/* Authenticated — any role */}
-          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-          <Route path="/create-profile" element={<ProtectedRoute roles={["user"]}><CreateProfile /></ProtectedRoute>} />
+            {/* Authenticated — any role */}
+            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            <Route path="/edit-profile" element={<ProtectedRoute><EditProfile /></ProtectedRoute>} />
+            <Route path="/create-profile" element={<ProtectedRoute roles={["user"]}><CreateProfile /></ProtectedRoute>} />
 
-          {/* Admin */}
-          <Route path="/admin" element={<ProtectedRoute roles={["admin"]}><AdminDashboard /></ProtectedRoute>} />
-          <Route path="/admin/users" element={<ProtectedRoute roles={["admin"]}><AdminUsers /></ProtectedRoute>} />
-          <Route path="/admin/analytics" element={<ProtectedRoute roles={["admin"]}><AdminAnalytics /></ProtectedRoute>} />
-          <Route path="/admin/recommendations" element={<ProtectedRoute roles={["admin"]}><AdminRecommendations /></ProtectedRoute>} />
-          <Route path="/admin/reports" element={<ProtectedRoute roles={["admin"]}><AdminReports /></ProtectedRoute>} />
+            {/* Admin */}
+            <Route path="/admin" element={<ProtectedRoute roles={["admin"]}><AdminDashboard /></ProtectedRoute>} />
+            <Route path="/admin/users" element={<ProtectedRoute roles={["admin"]}><AdminUsers /></ProtectedRoute>} />
+            <Route path="/admin/analytics" element={<ProtectedRoute roles={["admin"]}><AdminAnalytics /></ProtectedRoute>} />
+            <Route path="/admin/recommendations" element={<ProtectedRoute roles={["admin"]}><AdminRecommendations /></ProtectedRoute>} />
+            <Route path="/admin/reports" element={<ProtectedRoute roles={["admin"]}><AdminReports /></ProtectedRoute>} />
 
-          {/* Consultant */}
-          <Route path="/consultant" element={<ProtectedRoute roles={["consultant"]}><ConsultantDashboard /></ProtectedRoute>} />
-          <Route path="/consultant/clients" element={<ProtectedRoute roles={["consultant"]}><ConsultantClients /></ProtectedRoute>} />
-          <Route path="/consultant/assessments" element={<ProtectedRoute roles={["consultant"]}><ConsultantAssessments /></ProtectedRoute>} />
-          <Route path="/consultant/recommendations" element={<ProtectedRoute roles={["consultant"]}><ConsultantRecommendations /></ProtectedRoute>} />
+            {/* Consultant */}
+            <Route path="/consultant" element={<ProtectedRoute roles={["consultant"]}><ConsultantDashboard /></ProtectedRoute>} />
+            <Route path="/consultant/clients" element={<ProtectedRoute roles={["consultant"]}><ConsultantClients /></ProtectedRoute>} />
+            <Route path="/consultant/assessments" element={<ProtectedRoute roles={["consultant"]}><ConsultantAssessments /></ProtectedRoute>} />
+            <Route path="/consultant/recommendations" element={<ProtectedRoute roles={["consultant"]}><ConsultantRecommendations /></ProtectedRoute>} />
 
-          {/* Dermatologist */}
-          <Route path="/dermatologist" element={<ProtectedRoute roles={["dermatologist"]}><DermatologistDashboard /></ProtectedRoute>} />
-          <Route path="/dermatologist/patients" element={<ProtectedRoute roles={["dermatologist"]}><DermatologistPatients /></ProtectedRoute>} />
-          <Route path="/dermatologist/reports" element={<ProtectedRoute roles={["dermatologist"]}><DermatologistConditionReports /></ProtectedRoute>} />
-          <Route path="/dermatologist/notes" element={<ProtectedRoute roles={["dermatologist"]}><DermatologistTreatmentNotes /></ProtectedRoute>} />
-        </Routes>
+            {/* Dermatologist */}
+            <Route path="/dermatologist" element={<ProtectedRoute roles={["dermatologist"]}><DermatologistDashboard /></ProtectedRoute>} />
+            <Route path="/dermatologist/patients" element={<ProtectedRoute roles={["dermatologist"]}><DermatologistPatients /></ProtectedRoute>} />
+            <Route path="/dermatologist/reports" element={<ProtectedRoute roles={["dermatologist"]}><DermatologistConditionReports /></ProtectedRoute>} />
+            <Route path="/dermatologist/notes" element={<ProtectedRoute roles={["dermatologist"]}><DermatologistTreatmentNotes /></ProtectedRoute>} />
+
+            {/* 404 — must stay last */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </ToastProvider>
       </AuthProvider>
     </BrowserRouter>
   );

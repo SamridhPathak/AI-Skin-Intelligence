@@ -1,17 +1,16 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   TbUser, TbDroplet, TbMoon, TbRun, TbSun, TbBolt,
-  TbAlertCircle, TbTarget, TbPalette, TbId,
+  TbAlertCircle, TbTarget, TbPalette, TbId, TbEdit,
 } from "react-icons/tb";
 import { getMyProfile } from "../../services/profile";
 import MainLayout from "../../layouts/MainLayout";
 import SkinHealthRing from "../../components/SkinHealthRing";
+import { SkeletonCard } from "../../components/Skeleton";
 
 const NAV_ITEMS = [{ label: "My profile", icon: <TbUser />, to: "/profile" }];
 
-// Simple, transparent lifestyle indicator from the fields we actually have.
-// Not a clinical skin-health score (that lands with the real scoring engine
-// in Milestone 2) — just a friendlier way to surface the numbers you already gave us.
 function lifestyleScore(profile) {
   const waterScore = Math.min(profile.water_intake / 3, 1) * 100;
   const sleepScore = Math.min(profile.sleep_hours / 8, 1) * 100;
@@ -22,17 +21,19 @@ function lifestyleScore(profile) {
 function Profile() {
   const [profile, setProfile] = useState(null);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchProfile();
-  }, []);
+  useEffect(() => { fetchProfile(); }, []);
 
   const fetchProfile = async () => {
+    setLoading(true);
     try {
       const res = await getMyProfile();
       setProfile(res.data);
     } catch (err) {
       setError("Unable to load your profile right now.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -44,10 +45,12 @@ function Profile() {
     );
   }
 
-  if (!profile) {
+  if (loading || !profile) {
     return (
       <MainLayout navItems={NAV_ITEMS} brandLabel="Skin AI">
-        <p className="text-ink-secondary">Loading your profile...</p>
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
+          {Array.from({ length: 9 }).map((_, i) => <SkeletonCard key={i} />)}
+        </div>
       </MainLayout>
     );
   }
@@ -68,25 +71,22 @@ function Profile() {
 
   return (
     <MainLayout navItems={NAV_ITEMS} brandLabel="Skin AI">
-      <header className="flex items-center justify-between animate-in">
+      <header className="flex items-center justify-between animate-in flex-wrap gap-3">
         <div>
           <h1 className="text-xl font-semibold">My skin profile</h1>
           <p className="text-sm text-ink-secondary">Concerns: {profile.skin_concerns}</p>
         </div>
-        <SkinHealthRing
-          value={lifestyleScore(profile)}
-          tone="ocean"
-          size={72}
-          label="Lifestyle balance"
-        />
+        <div className="flex items-center gap-4">
+          <SkinHealthRing value={lifestyleScore(profile)} tone="ocean" size={72} label="Lifestyle balance" />
+          <Link to="/edit-profile" className="btn-outline flex items-center gap-2 h-fit">
+            <TbEdit /> Edit
+          </Link>
+        </div>
       </header>
 
       <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
         {fields.map((f, i) => (
-          <div
-            key={f.label}
-            className={`glass lift p-4 flex items-center gap-3 animate-in delay-${Math.min((i % 5) + 1, 5)}`}
-          >
+          <div key={f.label} className={`glass lift p-4 flex items-center gap-3 animate-in delay-${Math.min((i % 5) + 1, 5)}`}>
             <div className="w-9 h-9 rounded-full bg-ocean-100 text-ocean-600 flex items-center justify-center text-lg shrink-0">
               {f.icon}
             </div>

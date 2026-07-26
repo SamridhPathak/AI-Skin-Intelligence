@@ -1,12 +1,10 @@
 from fastapi import FastAPI
 from services.profile_service.app.db.init_db import init_db
 from services.profile_service.app.api.profile import router as profile_router
+from services.profile_service.app.api.care_team import router as care_team_router
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI(
-    title="Profile Service",
-    version="1.0.0"
-)
+app = FastAPI(title="Profile Service", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -17,6 +15,7 @@ app.add_middleware(
 )
 
 app.include_router(profile_router)
+app.include_router(care_team_router)
 
 
 @app.on_event("startup")
@@ -27,6 +26,4 @@ def startup():
 
 @app.get("/health")
 def health():
-    return {
-        "status": "Profile Service Running"
-    }
+    return {"status": "Profile Service Running"}

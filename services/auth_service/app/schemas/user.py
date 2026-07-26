@@ -2,7 +2,6 @@ from datetime import datetime
 from pydantic import BaseModel, EmailStr
 from typing import Literal
 
-# Open registration: any of these roles can be chosen at signup.
 RoleType = Literal["user", "consultant", "dermatologist", "admin"]
 
 
@@ -18,7 +17,6 @@ class UserLogin(BaseModel):
     password: str
 
 
-# Safe response shape — never includes password_hash.
 class UserOut(BaseModel):
     id: int
     full_name: str
@@ -28,3 +26,20 @@ class UserOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class UserBasic(BaseModel):
+    id: int
+    full_name: str
+
+    class Config:
+        from_attributes = True
+
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str
