@@ -2,14 +2,13 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   TbUser, TbDroplet, TbMoon, TbRun, TbSun, TbBolt,
-  TbAlertCircle, TbTarget, TbPalette, TbId, TbEdit,
+  TbAlertCircle, TbTarget, TbPalette, TbId, TbEdit, TbSparkles, TbClipboardCheck,
 } from "react-icons/tb";
 import { getMyProfile } from "../../services/profile";
 import MainLayout from "../../layouts/MainLayout";
 import SkinHealthRing from "../../components/SkinHealthRing";
 import { SkeletonCard } from "../../components/Skeleton";
-
-const NAV_ITEMS = [{ label: "My profile", icon: <TbUser />, to: "/profile" }];
+import { USER_NAV_ITEMS } from "../shared/userNav";
 
 function lifestyleScore(profile) {
   const waterScore = Math.min(profile.water_intake / 3, 1) * 100;
@@ -39,7 +38,7 @@ function Profile() {
 
   if (error) {
     return (
-      <MainLayout navItems={NAV_ITEMS} brandLabel="Skin AI">
+      <MainLayout navItems={USER_NAV_ITEMS} brandLabel="Skin AI">
         <p className="pill pill-flagged py-2 px-4 w-fit">{error}</p>
       </MainLayout>
     );
@@ -47,7 +46,7 @@ function Profile() {
 
   if (loading || !profile) {
     return (
-      <MainLayout navItems={NAV_ITEMS} brandLabel="Skin AI">
+      <MainLayout navItems={USER_NAV_ITEMS} brandLabel="Skin AI">
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
           {Array.from({ length: 9 }).map((_, i) => <SkeletonCard key={i} />)}
         </div>
@@ -70,7 +69,7 @@ function Profile() {
   ];
 
   return (
-    <MainLayout navItems={NAV_ITEMS} brandLabel="Skin AI">
+    <MainLayout navItems={USER_NAV_ITEMS} brandLabel="Skin AI">
       <header className="flex items-center justify-between animate-in flex-wrap gap-3">
         <div>
           <h1 className="text-xl font-semibold">My skin profile</h1>
@@ -83,6 +82,27 @@ function Profile() {
           </Link>
         </div>
       </header>
+
+      <div className="grid sm:grid-cols-2 gap-3">
+        <Link to="/assessment" className="glass lift p-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-ocean-100 text-ocean-600 flex items-center justify-center text-lg">
+            <TbSparkles />
+          </div>
+          <div>
+            <p className="font-medium text-ink-primary">Take your skin assessment</p>
+            <p className="text-xs text-ink-secondary">Get your Skin Health Score and a personalized routine</p>
+          </div>
+        </Link>
+        <Link to="/planner" className="glass lift p-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-sage-100 text-sage-600 flex items-center justify-center text-lg">
+            <TbClipboardCheck />
+          </div>
+          <div>
+            <p className="font-medium text-ink-primary">View your daily planner</p>
+            <p className="text-xs text-ink-secondary">Your AM/PM routine and progress</p>
+          </div>
+        </Link>
+      </div>
 
       <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
         {fields.map((f, i) => (

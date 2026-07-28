@@ -14,6 +14,9 @@ import ResetPassword from "./pages/ResetPassword/ResetPassword";
 import Unauthorized from "./pages/Unauthorized";
 import NotFound from "./pages/NotFound/NotFound";
 
+import AssessmentWizard from "./pages/Assessment/AssessmentWizard";
+import Planner from "./pages/Planner/Planner";
+
 import AdminDashboard from "./pages/Dashboard/AdminDashboard";
 import AdminUsers from "./pages/Dashboard/admin/AdminUsers";
 import AdminAnalytics from "./pages/Dashboard/admin/AdminAnalytics";
@@ -48,6 +51,10 @@ function App() {
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/edit-profile" element={<ProtectedRoute><EditProfile /></ProtectedRoute>} />
             <Route path="/create-profile" element={<ProtectedRoute roles={["user"]}><CreateProfile /></ProtectedRoute>} />
+
+            {/* Milestone 2 — user role */}
+            <Route path="/assessment" element={<ProtectedRoute roles={["user"]}><AssessmentWizard /></ProtectedRoute>} />
+            <Route path="/planner" element={<ProtectedRoute roles={["user"]}><Planner /></ProtectedRoute>} />
 
             {/* Admin */}
             <Route path="/admin" element={<ProtectedRoute roles={["admin"]}><AdminDashboard /></ProtectedRoute>} />
